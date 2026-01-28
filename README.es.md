@@ -1,4 +1,4 @@
-# 🐾 PET TRACKING – Sistema de Análisis Emocional y Comportamental
+# 🐾 PET TRACKING – Sistema de Análisis Emocional y Conductual
 
 ### Big Data · Streaming · Machine Learning · AWS · Power BI  
 [🇪🇸 Español](./README.es.md) | [🇬🇧 English](./README.md)
@@ -266,3 +266,7 @@ pet-tracking-project/
 ## 📚 Licencia
 Licencia MIT.
 Uso, modificación y distribución permitidos con atribución.
+
+---
+
+© 2025 – Pet Tracking | Sistema de Analítica Big Data e IA

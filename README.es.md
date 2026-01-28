@@ -1,207 +1,256 @@
-# 🐾 PET TRACKING – Intelligent Emotional Interpretation System
+# 🐾 PET TRACKING – Sistema de Análisis Emocional y Comportamental
 
-### Big Data & AI Project | AWS | Streaming | ML | Power BI
+### Big Data · Streaming · Machine Learning · AWS · Power BI  
 [🇪🇸 Español](./README.es.md) | [🇬🇧 English](./README.md)
 
 ---
 
-## 🚀 Overview
+## 🚀 Visión general
 
-**Pet Tracking** es un sistema inteligente diseñado para **interpretar en tiempo real las emociones y necesidades básicas de mascotas (perros y gatos)** mediante el análisis de señales fisiológicas, vocalizaciones y comportamiento físico.  
-Su arquitectura combina **Big Data, Machine Learning e IoT** para ofrecer una **comunicación emocional animal-humano** basada en datos objetivos y visualizaciones analíticas.
+**Pet Tracking** es un sistema de análisis de datos diseñado para **monitorizar, interpretar y anticipar el bienestar animal** a partir de señales fisiológicas, comportamiento y sonido.  
+El proyecto se plantea como un **sistema Big Data completo**, combinando **ingesta batch y streaming**, procesamiento distribuido, **Machine Learning integrado directamente en el warehouse** y visualización orientada a la toma de decisiones.
 
----
-
-## 🎯 Objetivos
-
-- Analizar grandes volúmenes de datos estructurados y no estructurados (sensores, audio, video, reportes).
-- Identificar patrones de conducta y estados emocionales.
-- Traducir emociones en mensajes comprensibles para cuidadores y veterinarios.
-- Generar visualizaciones interactivas en **Power BI**.
-- Prevenir estrés, ansiedad o enfermedades mediante **alertas inteligentes**.
+No es un modelo aislado.  
+Es una **arquitectura de datos de extremo a extremo**, pensada para escalar y operar en entornos reales.
 
 ---
 
-## 🧠 Arquitectura General
+## 🎯 Qué hace el sistema
+
+- Procesa datos heterogéneos (sensores, audio, actividad, eventos).
+- Detecta patrones de comportamiento y estados emocionales.
+- Identifica situaciones de riesgo mediante reglas y Machine Learning.
+- Expone resultados mediante consultas analíticas y dashboards.
+- Reduce la latencia entre evento y alerta en escenarios críticos.
+
+---
+
+## 🧠 Arquitectura del sistema (alto nivel)
 
 ```plaintext
-[Wearables / Cámaras / Micrófonos / Reportes]
+[Dispositivos IoT / Sensores / Audio / Reportes]
 ↓
-(Ingesta de Datos)
-├── AWS Glue / S3 (Batch)
-├── AWS Kinesis / Lambda / Firehose (Streaming)
+Capa de Ingesta
+├── AWS Glue + S3 (Batch)
+├── Kinesis + Lambda + Firehose (Streaming)
 ↓
-(Almacenamiento)
-Amazon S3 / Redshift / Athena
+Data Lake y Almacenamiento Analítico
+Amazon S3 / Athena / Redshift
 ↓
-(Procesamiento)
-Amazon EMR (Spark) / Redshift ML
+Procesamiento y Machine Learning
+EMR (Spark) / Redshift ML
 ↓
-(Visualización)
-Power BI Dashboard
+Capa de Decisión
+Dashboards Power BI
 ```
 
 ---
 
-## 🗂️ Recolección de Datos
+## 📥 Fuentes de datos
 
-| Fuente | Tipo de Datos |
-|---------|----------------|
-| **Wearables (Collares, Sensores)** | Ritmo cardíaco, temperatura, actividad física, GPS |
-| **Micrófonos Ambientales** | Vocalizaciones, tono emocional, frecuencia de sonidos |
-| **Cámaras** | Postura corporal, gestos, patrones de movimiento |
-| **Reportes de Cuidadores** | Etiquetas emocionales: alegría, ansiedad, hambre, dolor, etc. |
-
----
-
-## 🔄 Ingesta de Datos
-
-### 🧩 Batch (Diaria)
-- **Origen:** Reportes e historiales de sensores.
-- **Servicios AWS:**  
-  - `Amazon S3`  
-  - `AWS Glue Studio`, `Glue Data Catalog`, `Glue Data Quality`  
-- **Transformaciones:**  
-  - Normalización de tipos y nombres de columnas.  
-  - Clasificación de niveles de riesgo (`alert_level`) y actividad (`activity_level`).  
-  - Validación de calidad con `Glue Data Quality`.
-
-### ⚡ Streaming (Tiempo Real)
-- **Origen:** Dispositivos IoT enviando datos vitales y vocalizaciones.
-- **Servicios AWS:**  
-  - `Amazon Kinesis Data Streams`  
-  - `AWS Lambda` (transformación JSON → Parquet)  
-  - `Amazon Firehose` (entrega a S3)
-- **Formato:** Parquet comprimido con Snappy, particionado por año/mes/día.
+| Fuente | Datos |
+|------|------|
+| Wearables y sensores | Ritmo cardíaco, temperatura, actividad, GPS |
+| Micrófonos | Vocalizaciones y patrones sonoros |
+| Cámaras | Movimiento y postura (extensión conceptual) |
+| Reportes humanos | Etiquetas emocionales (alegría, ansiedad, dolor, hambre, etc.) |
 
 ---
 
-## 🧱 Almacenamiento de Datos
+## 🔄 Ingesta de datos
+Ingesta Batch
+Origen: Reportes periódicos y datos históricos.
 
-Estructura del bucket principal:  
-`s3://pet-tracking-data-bucket/`
+Servicios AWS:
+
+Amazon S3
+
+AWS Glue Studio
+
+Glue Data Catalog
+
+Glue Data Quality
+
+Operaciones clave:
+
+Normalización de esquemas
+
+Forzado de tipos
+
+Validaciones de calidad
+
+Preparación para pipelines reproducibles
+
+Ingesta Streaming (Tiempo real)
+Origen: Dispositivos IoT emitiendo eventos continuamente.
+
+Servicios AWS:
+
+Amazon Kinesis Data Streams
+
+AWS Lambda (transformación y enriquecimiento JSON)
+
+Amazon Firehose (entrega a S3)
+
+Formato:
+
+Parquet + Snappy
+
+Particionado por year / month / day
+
+---
+
+## 🧱 Diseño del Data Lake y almacenamiento
+Bucket principal:
+s3://pet-tracking-data-bucket/
 
 ```plaintext
 ├── raw/
-│   ├── batch/ (Datos crudos por lotes)
-│   ├── stream/ (Datos en tiempo real)
-├── processed/ (Datos transformados)
-├── firehose-output/ (Salida automática de Firehose)
+│   ├── batch/
+│   └── stream/
+├── processed/
+├── firehose-output/
 ├── warehouse/
 │   ├── athena/
 │   └── redshift/
 ├── dashboards/
-│   ├── powerbi/
-│   └── data_snapshots/
 ├── logs/
 ├── archive/
-└── s3-management/ (Lifecycle rules)
-```
-
-### Políticas de Ciclo de Vida en S3
-
-| Carpeta | Acción | Tiempo |
-|----------|---------|--------|
-| `raw/batch/` | Mover a Glacier | 30 días |
-| `raw/stream/` | Eliminar | 7 días |
-| `processed/` | Eliminar | 90 días |
-| `firehose-output/` | Eliminar | 60 días |
-
----
-
-## ⚙️ Procesamiento Analítico
-
-### 🔸 AWS EMR (Apache Spark)
-- Limpieza, agregación y enriquecimiento de datos.
-- Scripts en `PySpark` almacenados en `emr/scripts/`.
-- Resultados exportados a `emr/results/`.
-- Configuración escalable mediante `bootstrap actions` y `roles` dedicados.
-
-### 🔸 Redshift + Redshift ML
-- Integración con S3 vía **Spectrum**.
-- Entrenamiento de modelo **K-Means** sobre métricas numéricas:
-  - `age`, `heart_rate_bpm`, `activity_steps`, `gps_lat`, `gps_lon`.
-- Predicción de clústeres de comportamiento emocional.
-- Resultados disponibles para dashboards o alertas.
-
-### 🔸 Athena
-- Consultas SQL sobre tablas particionadas en Parquet.
-- Ejemplo de query:
-  ```sql
-  SELECT emotion, COUNT(*) AS freq
-  FROM pet_sounds_data_cleaned
-  GROUP BY emotion
-  ORDER BY freq DESC;
-  ```
-
----
-
-## 📊 Visualización (Power BI)
-
-**Dashboard 1 – Análisis de Datos y Emociones**
-- Volumen de audios registrados.
-- Emoción más común.
-- Evolución de emociones en el tiempo.
-- Frecuencia máxima por emoción.
-- Tabla con espectrogramas asociados.
-
-**Indicadores Clave (DAX):**
-```DAX
-Total_Audios = COUNT('pet-sound-data'[IDAudio])
-
-Emocion_Mas_Comun = 
-CALCULATE(
-    MAXX(
-        TOPN(1, 
-            SUMMARIZE('pet-sounds-data', 'pet-sounds-data'[Emocion], 
-                      "Conteo", COUNT('pet-sounds-data'[Emocion])
-            ), [Conteo], DESC
-        ),
-    'pet-sounds-data'[Emocion]
-)
-)
+└── s3-management/
 ```
 
 ---
 
-## 🧩 Servicios AWS Utilizados
+### Políticas de ciclo de vida
 
-| Etapa | Servicios AWS |
-|--------|----------------|
-| **Ingesta Batch** | AWS Glue Studio, Glue Data Catalog, S3 |
-| **Ingesta Streaming** | Kinesis Data Streams, Lambda, Firehose |
-| **Almacenamiento** | S3, Redshift, Athena |
-| **Procesamiento** | EMR (Spark), Redshift ML |
-| **Visualización** | Power BI |
-
----
-
-## 🧾 Beneficios e Impacto
-
-| Beneficio | Impacto |
-|------------|----------|
-| Comunicación emocional animal-humano | Mejora la relación y empatía con la mascota |
-| Prevención de estrés o enfermedad | Detección temprana basada en datos |
-| Herramienta para veterinarios | Diagnóstico complementario y predictivo |
-| Personalización por raza e individuo | Modelos IA adaptativos |
-| Aplicación educativa y social | Uso en hogares, refugios y clínicas |
+| Ruta | Acción | Retención |
+|------|--------|-----------|
+| raw/batch/ | Glacier | 30 días |
+| raw/stream/ | Eliminar | 7 días |
+| processed/ | Eliminar | 90 días |
+| firehose-output/ | Eliminar | 60 días |
 
 ---
 
-## 🧩 Buenas Prácticas Implementadas
+## ⚙️ Procesamiento analítico
+AWS EMR (Apache Spark)
+Procesamiento distribuido para:
 
-- **Data Lake estructurado** con separación clara entre raw, processed y results.
-- **Data Quality** con Glue para garantizar consistencia y completitud.
-- **Particionado temporal** (`year/`, `month/`, `day/`) para escalabilidad.
-- **Integración total con servicios nativos de AWS**.
-- **Seguridad y gobernanza** mediante roles IAM y reglas de ciclo de vida.
-- **Documentación completa** en `/docs` con arquitectura y dependencias.
+Limpieza de datos
+
+Agregaciones por mascota
+
+Clasificación de actividad
+
+Detección de anomalías y alertas
+
+Jobs PySpark ejecutados sobre clusters EMR.
+
+Resultados persistidos en S3 para consumo posterior.
+
+Athena
+Consultas SQL ad-hoc sobre datos Parquet particionados.
+
+Uso para exploración, validación y análisis ligero.
+
+Ejemplo:
+
+```sql
+SELECT emotion, COUNT(*) AS freq
+FROM pet_behavior_parquet
+GROUP BY emotion
+ORDER BY freq DESC;
+```
 
 ---
 
-## 📁 Estructura del Proyecto (Resumen)
+## 🤖 Machine Learning dentro del warehouse
+Redshift + Redshift ML
+Modelo no supervisado K-Means entrenado directamente en Redshift.
 
+Features utilizadas:
+
+age
+
+heart_rate_bpm
+
+activity_steps
+
+gps_lat, gps_lon
+
+El modelo se utiliza directamente en consultas SQL para asignar clústeres de comportamiento.
+
+No se requieren pipelines ML externos.
+
+Esto permite analítica y Machine Learning en una única capa.
+
+---
+
+## 📊 Visualización y toma de decisiones
+Dashboards en Power BI
+
+Estado emocional
+
+Nivel de actividad
+
+Distribución de comportamientos
+
+Indicadores de riesgo y alertas
+
+Diseñados para:
+
+Veterinarios
+
+Cuidadores
+
+Usuarios no técnicos
+
+El foco está en la decisión, no en el detalle técnico.
+
+---
+
+🧩 Por qué este no es un proyecto de juguete
+Arquitectura híbrida batch + streaming.
+
+Validaciones explícitas de calidad del dato.
+
+Separación clara entre raw, processed y capa analítica.
+
+Procesamiento distribuido con Spark.
+
+Machine Learning integrado en el warehouse, no en notebooks.
+
+Diseño orientado a escalabilidad, gobernanza y reproducibilidad.
+
+---
+
+## 🛠️ Servicios AWS utilizados
+| Capa | Servicios |
+|------|-----------|
+| Ingesta Batch | S3, Glue Studio, Glue Catalog, Glue Data Quality |
+| Ingesta Streaming | Kinesis, Lambda, Firehose |
+| Almacenamiento | S3, Athena, Redshift |
+| Procesamiento | EMR (Spark), Redshift ML |
+| Visualización | Power BI |
+
+---
+
+🧪 Próximos pasos
+Deep Learning multimodal (CNN/LSTM) para emociones complejas.
+
+Integración con Amazon SageMaker para orquestación ML.
+
+Aplicación móvil con notificaciones en tiempo real.
+
+Uso de AWS IoT Core para gestión directa de dispositivos.
+
+Detección de concept drift y reentrenamiento de modelos.
+
+---
+
+## 📁 Estructura del proyecto
 ```plaintext
+Copiar código
 pet-tracking-project/
 ├── glue/
 ├── kinesis/
@@ -214,30 +263,6 @@ pet-tracking-project/
 
 ---
 
-## 🧪 Futuras Mejoras
-
-- Incorporación de modelos **Deep Learning** (CNN/LSTM) para análisis multimodal de emociones.
-- Integración con **Amazon SageMaker** para orquestación de pipelines ML.
-- Aplicación móvil con notificaciones push para alertas de bienestar.
-- Uso de **AWS IoT Core** para gestión directa de dispositivos.
-
----
-
-## 👥 Autores y Créditos
-
-**Proyecto desarrollado por:**  
-Equipo de Ingeniería en Big Data & IA  
-**Rol:** Arquitectura, Integración y Análisis Predictivo  
-**Infraestructura:** AWS Cloud  
-**Visualización:** Power BI  
-
----
-
 ## 📚 Licencia
-
-Este proyecto está bajo la licencia **MIT**.  
-Puedes usarlo, modificarlo y distribuirlo citando la fuente original.
-
----
-
-**© 2025 – Pet Tracking | Big Data & AI Emotion Analytics**
+Licencia MIT.
+Uso, modificación y distribución permitidos con atribución.
